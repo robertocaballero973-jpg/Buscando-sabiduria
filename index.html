@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BUSCAR SABIDURÍA - R.G Caballero</title>
+<meta name="description" content="No para ser mejor que otros, sino mejor que yo cada día - 40 principios para una vida sostenible entre la fe, la razón y el propósito">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+<link rel="icon" type="image/png" href="/icons/icon-192x192.png">
+<style>
+:root { --bg: #fdfcf7; --text: #1a1a1a; --accent: #8b6f47; --paper: #ffffff; }
+.dark { --bg: #121212; --text: #e8e6e1; --paper: #1e1e1e; --accent: #d4b896; }
+.sepia { --bg: #f4ecd8; --text: #433422; --paper: #fdf6e3; }
+*{box-sizing:border-box}
+body{margin:0; font-family: 'Georgia', serif; background:var(--bg); color:var(--text); transition: all 0.3s; overflow-x:hidden}
+.book-container{max-width:800px; margin:0 auto; min-height:100vh; background:var(--paper); box-shadow:0 0 40px rgba(0,0,0,0.1); position:relative}
+.cover{height:100vh; background: url('/cover.jpg') center/cover; display:flex; flex-direction:column; justify-content:space-between; position:relative}
+.cover::before{content:''; position:absolute; inset:0; background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 50%, rgba(0,0,0,0.8) 100%)}
+.cover-content{position:relative; z-index:1; padding:40px 20px; text-align:center; color:white}
+.cover-title{font-size:2.5rem; font-weight:bold; letter-spacing:2px; margin:0; text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.cover-subtitle{font-size:1rem; margin:15px 0; color:#f5e6c8; font-style:italic}
+.cover-author{margin-top:auto; background:rgba(15,15,15,0.9); padding:20px; text-align:center}
+.controls{position:fixed; top:0; left:0; right:0; background:var(--paper); border-bottom:1px solid #ddd; padding:10px; display:flex; gap:8px; align-items:center; z-index:100; flex-wrap:wrap}
+.btn{padding:8px 12px; border:1px solid var(--accent); background:var(--paper); color:var(--text); border-radius:20px; cursor:pointer; font-size:0.85rem}
+.btn.active{background:var(--accent); color:white}
+.page{padding:80px 30px 40px; min-height:100vh; line-height:1.8; animation: fadeIn 0.4s}
+@keyframes fadeIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)}}
+.progress{position:fixed; bottom:0; left:0; height:3px; background:var(--accent); transition:width 0.3s; z-index:101}
+.font-serif{font-family: Georgia, serif} .font-sans{font-family: -apple-system, sans-serif} .font-dys{font-family: 'OpenDyslexic', sans-serif; letter-spacing:0.5px}
+.toc{position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:200; display:none; padding:20px; overflow:auto}
+.toc.open{display:block}
+.toc-content{background:var(--paper); max-width:400px; margin:40px auto; padding:20px; border-radius:10px}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="controls">
+<button class="btn" onclick="toggleTOC()">📑 Índice</button>
+<button class="btn" onclick="changeFont('serif')">Aa Serif</button>
+<button class="btn" onclick="changeFont('sans')">Sans</button>
+<button class="btn" onclick="changeFont('dys')">Dislexia</button>
+<button class="btn" onclick="toggleTheme()">🌙 Noche</button>
+<button class="btn" onclick="speakPage()">🔊 Voz</button>
+<button class="btn" onclick="nextPage()">Siguiente →</button>
+</div>
+
+<div class="book-container" id="book">
+<div class="cover" id="coverPage">
+<div class="cover-content">
+<h1 class="cover-title">BUSCAR SABIDURÍA</h1>
+<p class="cover-subtitle">No para ser mejor que otros,<br><strong>sino mejor que yo cada día.</strong></p>
+<p style="font-size:0.9rem; opacity:0.9">40 principios para una vida sostenible entre la fe, la razón y el propósito</p>
+</div>
+<div class="cover-author"><strong>R.G Caballero</strong><br><small>Apóstoles, Misiones - Noviembre 2026</small></div>
+</div>
+
+<div class="page" id="pageContent">
+<!-- Content will be injected by JS -->
+</div>
+</div>
+
+<div class="toc" id="toc">
+<div class="toc-content">
+<h3>Índice</h3>
+<ul id="tocList" style="list-style:none; padding:0"></ul>
+<button class="btn" onclick="toggleTOC()" style="margin-top:20px; width:100%">Cerrar</button>
+</div>
+</div>
+
+<script>
+const pages = [
+{title:"¿Por qué esta portada?", content:`
+<p>Si te detuviste en la portada, no fue por casualidad. Esta imagen no está acá para que el libro se vea bonito. Está acá porque es el resumen de todo lo que vas a leer.</p>
+<p><strong>Este no es un libro de autoayuda. No es un libro de moral. Y tampoco es un libro de religión</strong> como doctrina que aparta. Nace de preguntas que todos nos hicimos alguna vez.</p>
+<p><strong>LA NEBLINA:</strong> Es la duda. Es el momento en que no ves claro.<br/>
+<strong>EL BOSQUE:</strong> Es la vida, grande y a veces abrumadora.<br/>
+<strong>EL CAMINO ANGOSTO:</strong> No es difícil porque Dios lo hizo difícil. Es angosto porque se camina de a uno. Mateo 7:13-14. No es para ser mejor que otros, es para ser responsable de tu propio paso.<br/>
+<strong>LA SILUETA:</strong> Sos vos. Soy yo. Pequeños pero caminando.<br/>
+<strong>MIRANDO AL CIELO:</strong> Es Pedro en el agua hundiéndose y extendiendo la mano. Es Salomón pidiendo corazón entendido.<br/>
+<strong>LA LUZ:</strong> Es la sabiduría. No te da todas las respuestas, pero te deja dar el próximo paso.</p>
+<p><em>Por eso esta tapa. No es autoayuda. Es el dibujo de una búsqueda. La mía. Y quizás, también la tuya.</em></p>
+`},
+{title:"I. Principios de conducta personal (1-17)", content:`
+<h2>I. Conducta Personal</h2>
+<p><strong>1. Responsabilidad:</strong> asumir las consecuencias de nuestros actos. La sabiduría la sostiene enseñándonos a pensar antes de actuar.</p>
+<p><strong>2. Honestidad:</strong> actuar con verdad, incluso cuando no nos favorece.</p>
+<p><strong>3. Prudencia:</strong> pensar antes de actuar.</p>
+<p><strong>4. Discernimiento:</strong> distinguir entre lo correcto, lo conveniente y lo perjudicial.</p>
+<p><strong>5. Respeto:</strong> reconocer el valor de los demás.</p>
+<p><strong>6. Dignidad:</strong> ninguna persona debe ser tratada como objeto.</p>
+<p><strong>7. Empatía:</strong> intentar comprender la realidad ajena sin juzgar desde la propia experiencia.</p>
+<p><strong>8. Compasión:</strong> reconocer el sufrimiento y procurar aliviarlo sin generar dependencia.</p>
+<p><strong>9. Paciencia:</strong> comprender que los procesos necesitan tiempo.</p>
+<p><strong>10. Perseverancia:</strong> continuar a pesar de las dificultades, sabiendo cuándo insistir y cuándo modificar el camino.</p>
+<p><strong>11. Valentía:</strong> defender lo correcto sin que se convierta en temeridad.</p>
+<p><strong>12-17:</strong> Templanza, Autodominio, Disciplina, Constancia, Compromiso y Transparencia: la sabiduría nos enseña a poner límites, responder con reflexión y mantener coherencia entre palabras y acciones.</p>
+`},
+{title:"II. Pensamiento y conocimiento (18-24)", content:`
+<h2>II. Pensamiento</h2>
+<p><strong>18. Escucha activa:</strong> comprender antes de responder.</p>
+<p><strong>19. Diálogo:</strong> buscar entendimiento, no competencia de egos.</p>
+<p><strong>20. Apertura mental:</strong> considerar perspectivas diferentes sin abandonar el pensamiento propio.</p>
+<p><strong>21. Aprendizaje continuo:</strong> el conocimiento nunca debe convertirse en soberbia.</p>
+<p><strong>22. Autoconocimiento:</strong> identificar capacidades, limitaciones y contradicciones.</p>
+<p><strong>23. Autocrítica:</strong> examinarnos con el mismo rigor que a los demás.</p>
+<p><strong>24. Rectificación:</strong> corregir sin que el orgullo lo impida.</p>
+<p><em>Reflexión larga:</em> Salomón pidió corazón entendido (1 Reyes 3), Santiago 1:5 invita a pedir sabiduría. La búsqueda activa y la oración no se oponen.</p>
+`},
+{title:"III. Convivencia (25-33) y IV. Equilibrio (34-40)", content:`
+<h2>III. Convivencia</h2>
+<p>Gratitud, Generosidad, Solidaridad, Servicio, Reciprocidad, Cooperación, Perdón, Reconciliación, Límites saludables. La sabiduría nos enseña cuándo ayudar, cuándo perdonar y cuándo preservar distancia.</p>
+<h2>IV. Equilibrio y Propósito</h2>
+<p><strong>34. Cuidado:</strong> proteger personas, vínculos y naturaleza.<br/>
+<strong>35. Moderación:</strong> evitar excesos.<br/>
+<strong>36. Previsión:</strong> no sacrificar futuro por satisfacción inmediata.<br/>
+<strong>37. Esperanza:</strong> conservar posibilidad de futuro mejor sin confundirla con fantasía.<br/>
+<strong>38. Propósito:</strong> distinguir entre lo que deseo y lo que merece mi esfuerzo.<br/>
+<strong>39. Uso responsable del poder:</strong> tener poder no significa tener siempre la razón.<br/>
+<strong>40. Protección de los vulnerables:</strong> la fortaleza adquiere sentido cuando protege.</p>
+<p><strong>Conclusión:</strong> La sabiduría es el eje integrador. La razón examina fundamentos, la fe aporta dimensión trascendente, la sabiduría orienta decisiones.</p>
+`},
+{title:"Ensayos: Fe, Razón y Propósito", content:`
+<h2>Buscar Sabiduría - Ensayos</h2>
+<p><strong>Introspección:</strong> distinguir entre tener un pensamiento y convertirlo en intención. Salmos 139:23</p>
+<p><strong>Pensamiento y tentación:</strong> Santiago 1:14-15, Filipenses 4:8. Dominio propio no es negar deseos, es responder responsablemente.</p>
+<p><strong>Filosofía y humildad:</strong> "Solo sé que no sé nada" no es cita literal de Sócrates, pero apunta a humildad intelectual que abre aprendizaje.</p>
+<p><strong>Babel y Pentecostés:</strong> Génesis 11 vs Hechos 2 - de barrera a puente. Diversidad no impide comprensión.</p>
+<p><strong>Conciencia y libertad:</strong> Génesis 2-3, libre albedrío vs conocimiento moral. ¿Buscamos sabiduría para comprender o para colocarnos por encima?</p>
+<p><strong>La razón y el bien:</strong> Romanos 2:14-15 - gentiles que hacen por naturaleza lo que es de la ley. Conciencia que acusa o defiende.</p>
+<p><strong>Felicidad y propósito:</strong> No confundir meta con sentido entero. Efesios 2:10 - creados para buenas obras, no para comprar amor de Dios, sino para orientar vida al bien.</p>
+`},
+{title:"Acompañar el proyecto", content:`
+<h2>Acompañar este proyecto</h2>
+<p>Este proyecto nació de una búsqueda personal, no de un fin comercial. Por eso no existe un importe establecido ni ninguna obligación de colaborar.</p>
+<p>Si estas páginas te acompañaron y querés que siga creciendo, podés acompañarlo con un aporte voluntario.</p>
+<p><em>Tu aporte no compra una respuesta, no condiciona el acceso al conocimiento. Es simplemente una manera de decir: "Quiero que sigas buscando".</em></p>
+<div style="background:#fff; border:1px solid #d9c7a5; padding:15px; border-radius:8px; margin:20px 0">
+<p><strong>Billetera:</strong> Personal Pay<br/>
+<strong>Alias:</strong> rcaballero13.ppay<br/>
+<strong>Titular:</strong> Roberto Gabriel Caballero</p>
+</div>
+<p style="text-align:center; font-style:italic">"No para ser mejor que otros, sino mejor que yo cada día."<br/>Gracias por ser parte de este camino.<br/><br/>R.G Caballero</p>
+`}
+];
+
+let currentPage = -1;
+let currentTheme = 'light';
+let currentFont = 'serif';
+let synth = window.speechSynthesis;
+
+function renderPage(idx){
+  if(idx<0){ document.getElementById('pageContent').style.display='none'; document.getElementById('coverPage').style.display='flex'; currentPage=-1; updateProgress(); return;}
+  document.getElementById('coverPage').style.display='none';
+  const pc = document.getElementById('pageContent');
+  pc.style.display='block';
+  pc.innerHTML = `<h1>${pages[idx].title}</h1>` + pages[idx].content + `<div style="margin-top:40px; display:flex; justify-content:space-between"><button class="btn" onclick="prevPage()">← Anterior</button><button class="btn" onclick="nextPage()">Siguiente →</button></div>`;
+  currentPage=idx;
+  updateProgress();
+  window.scrollTo(0,0);
+  if(synth.speaking) synth.cancel();
+}
+
+function nextPage(){ if(currentPage < pages.length-1) renderPage(currentPage+1); else if(currentPage==-1) renderPage(0); }
+function prevPage(){ if(currentPage>0) renderPage(currentPage-1); else if(currentPage==0) renderPage(-1); }
+
+function updateProgress(){
+  const total = pages.length+1;
+  const cur = currentPage+2;
+  document.getElementById('progress').style.width = (cur/total*100)+'%';
+}
+
+function toggleTheme(){
+  const body = document.body;
+  if(currentTheme=='light'){ body.classList.add('dark'); currentTheme='dark'; }
+  else if(currentTheme=='dark'){ body.classList.remove('dark'); body.classList.add('sepia'); currentTheme='sepia'; }
+  else { body.classList.remove('sepia'); currentTheme='light'; }
+}
+
+function changeFont(f){
+  const pc = document.getElementById('book');
+  pc.classList.remove('font-serif','font-sans','font-dys');
+  pc.classList.add('font-'+f);
+  currentFont=f;
+}
+
+function speakPage(){
+  if(synth.speaking){ synth.cancel(); return; }
+  let text = "";
+  if(currentPage==-1) text = document.querySelector('.cover-title').innerText + ". " + document.querySelector('.cover-subtitle').innerText;
+  else text = pages[currentPage].content.replace(/<[^>]*>/g, ' ');
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang='es-AR';
+  utter.rate=0.95;
+  synth.speak(utter);
+}
+
+function toggleTOC(){
+  document.getElementById('toc').classList.toggle('open');
+}
+
+function buildTOC(){
+  const list = document.getElementById('tocList');
+  const coverItem = document.createElement('li');
+  coverItem.innerHTML = `<a href="#" onclick="renderPage(-1); toggleTOC(); return false;" style="display:block; padding:10px; border-bottom:1px solid #eee">📖 Portada</a>`;
+  list.appendChild(coverItem);
+  pages.forEach((p,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="#" onclick="renderPage(${i}); toggleTOC(); return false;" style="display:block; padding:10px; border-bottom:1px solid #eee">${i+1}. ${p.title}</a>`;
+    list.appendChild(li);
+  });
+}
+
+buildTOC();
+renderPage(-1);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>

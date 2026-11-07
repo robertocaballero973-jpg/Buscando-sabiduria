@@ -60,7 +60,7 @@ body.night{--bg:#17191d;--paper:#22252a;--ink:#e5e0d7;--muted:#a8a197;--panel:#2
     </div>
     <div class="reader-controls">
       <button id="prevBtn" class="nav-btn">‹ <span>Anterior</span></button>
-      <div class="progress-wrap"><div class="progress-track"><div id="progressBar"></div></div><small id="progressText">0%</small></div>
+      <div class="progress-wrap"><div class="progress-track"><div id="progressBar"></div></div><small id="progressText">Portada · 36 apartados</small></div>
       <button id="nextBtn" class="nav-btn"><span>Siguiente</span> ›</button>
     </div>
     <div class="mobile-tools">
@@ -128,7 +128,7 @@ function render(animate=''){
  let contentTitle=s.id==='tapa'?`<img class="book-cover-main" src="${esc(book.cover)}" alt="Portada de Buscar Sabiduría">`:`<h1>${esc(s.title)}</h1>`;
  el.pageContent.innerHTML=contentTitle+(s.id==='tapa'?'':parseContent(raw,s));
  el.part.textContent=s.part;el.chapter.textContent=heading;el.pageNumber.textContent='';el.prev.disabled=current===0;el.next.disabled=current===sections.length-1;
- const pct=Math.round((current/(sections.length-1))*100);el.progress.style.width=pct+'%';el.progressText.textContent=pct+'%';
+ const pct=Math.round((current/(sections.length-1))*100);el.progress.style.width=pct+'%';el.progressText.textContent=current===0?'Portada · 36 apartados':`Apartado ${current} de ${sections.length-1}`;
  const marked=bookmarks.includes(s.id);$('#bookmarkBtn').classList.toggle('saved',marked);$('#bookmarkBtn').innerHTML=marked?'★ <span>Guardado</span>':'☆ <span>Marcar</span>';$('#mobileBookmark').textContent=marked?'★ Marcado':'☆ Marcador';
  $('#audioRate').value=String(speechRate);updateAudioUI();renderTOC();persist();window.scrollTo({top:0,behavior:'smooth'});
 }

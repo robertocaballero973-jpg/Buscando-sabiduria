@@ -18,6 +18,17 @@ body.night{--bg:#17191d;--paper:#22252a;--ink:#e5e0d7;--muted:#a8a197;--panel:#2
 .audio-panel{width:min(100%,850px);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:9px auto 2px;padding:10px 14px;background:#e8e0d2;border-radius:12px;color:#514a3d;font-size:12px}.audio-panel[hidden]{display:none}.audio-control{border:0;background:#302c25;color:#fff7e8;border-radius:20px;padding:8px 13px;font-size:12px;cursor:pointer}.audio-panel select{border:1px solid #d8d0c2;background:#f8f4ec;border-radius:7px;padding:6px;color:inherit}.audio-panel span{color:#7b6b54}body.night .audio-panel{background:#292c31;color:#ddd5c8}body.night .audio-control{background:#b2874e;color:#191714}body.night .audio-panel select{background:#22252a;color:#e5e0d7;border-color:#42444a}@media(max-width:800px){.audio-panel{font-size:11px;gap:7px}.mobile-tools{flex-wrap:wrap}}
 
 .book-cover-main{display:block;max-width:min(100%,410px);max-height:65vh;width:auto;height:auto;margin:0 auto;box-shadow:0 12px 30px #0005;border-radius:4px}
+
+/* The complete 40-principle list is laid out as readable individual entries. */
+.principle-intro{margin:0 0 1.25rem;padding:1rem 1.1rem;border-left:3px solid var(--accent);background:var(--panel);border-radius:0 12px 12px 0;line-height:1.7}
+.principle-group{margin:1.7rem 0 2rem}
+.principle-group-title{margin:0 0 .9rem;padding:.65rem .85rem;border-bottom:1px solid var(--line);color:var(--accent);font:700 .98rem/1.4 var(--reader-face);letter-spacing:.035em}
+.principle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.principle-card{min-width:0;padding:.85rem .95rem;border:1px solid var(--line);border-radius:12px;background:var(--paper);box-shadow:0 2px 8px #0000000a}
+.principle-card h3{margin:0 0 .38rem;color:var(--ink);font:700 .96rem/1.35 var(--reader-face)}
+.principle-card h3 span{color:var(--accent)}
+.principle-card p{margin:0;color:var(--ink);font-size:.9rem;line-height:1.55}.night .principle-intro{background:#2b2a26}.night .principle-card{background:#292b2f}.night .principle-group-title{border-color:#3c3e42}
+@media(max-width:620px){.principle-grid{grid-template-columns:1fr;gap:.55rem}.principle-card{padding:.8rem .85rem}.principle-group{margin:1.25rem 0 1.5rem}}
 </style>
 <title>Buscar Sabiduría — R.G Caballero</title>
 </head>
@@ -105,7 +116,30 @@ let overrides=saved.overrides||{};
 const el={toc:$('#toc'),page:$('#page'),pageContent:$('#pageContent'),part:$('#partLabel'),chapter:$('#chapterLabel'),pageNumber:$('#pageNumber'),progress:$('#progressBar'),progressText:$('#progressText'),prev:$('#prevBtn'),next:$('#nextBtn'),stage:$('.book-stage'),toast:$('#toast')};
 function persist(){localStorage.setItem(storageKey,JSON.stringify({current:sections[current].id,fontSize,lineHeight,fontFamily,night,flip,bookmarks,overrides,speechRate}));}
 function esc(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function parseFortyPrinciples(raw){
+ const groupRe=/(?:^|\s)(I|II|III|IV)\.\s+Principios de (conducta personal|pensamiento y conocimiento|convivencia y relaciones humanas|equilibrio y propósito)/g;
+ const groups=[...raw.matchAll(groupRe)];if(groups.length!==4)return null;
+ const escText=x=>esc(x.trim());let html='',intro=raw.slice(0,groups[0].index).trim();
+ if(intro)html+=`<div class="principle-intro">${escText(intro)}</div>`;
+ const labels={I:'Conducta personal',II:'Pensamiento y conocimiento',III:'Convivencia y relaciones humanas',IV:'Equilibrio y propósito'};
+ for(let g=0;g<groups.length;g++){
+  const match=groups[g],start=match.index+(raw.slice(match.index).startsWith(' ') ? 1:0),bodyStart=match.index+match[0].length;
+  const bodyEnd=g+1<groups.length?groups[g+1].index:raw.length;
+  const body=raw.slice(bodyStart,bodyEnd).trim();
+  const reItem=/(?:^|\s)(\d{1,2})\.\s+([^:\n]{2,90}):\s*/g,items=[...body.matchAll(reItem)];
+  if(!items.length)continue;
+  html+=`<section class="principle-group"><h2 class="principle-group-title">${match[1]}. ${esc(labels[match[1]])}</h2><div class="principle-grid">`;
+  for(let j=0;j<items.length;j++){
+   const it=items[j],num=it[1],name=it[2].trim(),descStart=it.index+it[0].length,descEnd=j+1<items.length?items[j+1].index:body.length;
+   const description=body.slice(descStart,descEnd).trim();
+   html+=`<article class="principle-card"><h3><span>${esc(num)}.</span> ${esc(name)}</h3><p>${esc(description)}</p></article>`;
+  }
+  html+='</div></section>';
+ }
+ return html;
+}
 function parseContent(raw,section){
+ if((section.title||'').startsWith('40 Principios Para Una Vida Sostenible')){const formatted=parseFortyPrinciples(raw);if(formatted)return formatted;}
  const lines=raw.split(/\r?\n/);let html='',para=[],list=[];
  const flushPara=()=>{if(para.length){const txt=para.join(' ').trim();if(txt)html+=`<p>${esc(txt)}</p>`;para=[];}};
  const flushList=()=>{if(list.length){html+='<ul>'+list.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul>';list=[];}};

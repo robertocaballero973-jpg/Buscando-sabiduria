@@ -45,6 +45,15 @@ body.night{--bg:#17191d;--paper:#22252a;--ink:#e5e0d7;--muted:#a8a197;--panel:#2
 .night .reflection-card{background:#292b2f;border-color:#3c3e42}.night .reflection-btn{background:#292b2f;color:var(--ink);border-color:#3c3e42}.night .reflection-btn.primary{background:#d6ad71;color:#25231f;border-color:#d6ad71}
 .reflection-modal{width:min(94vw,680px)}#reflectionArea{width:100%;min-height:190px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:13px;font:16px/1.6 system-ui,sans-serif;color:var(--ink);background:var(--paper)}.reflection-hint{font-size:.85rem;line-height:1.5;color:var(--muted)}
 @media(max-width:620px){.reflection-card{margin:1.2rem 0 .7rem;padding:.9rem}.reflection-actions>*{flex:1}}
+
+.install-prompt{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px 18px;background:#f2ead9;border-bottom:1px solid #e1d5bd;color:#382f22}
+.install-prompt[hidden]{display:none}
+.install-copy{display:flex;flex-direction:column;gap:1px}.install-copy strong{font:700 13px/1.35 system-ui,sans-serif}.install-copy span{font:400 12px/1.4 system-ui,sans-serif;color:#756b5c}
+.install-cta{border:0;border-radius:999px;background:#302c25;color:#fff7e8;padding:9px 15px;font:700 12px system-ui,sans-serif;cursor:pointer;white-space:nowrap;box-shadow:0 2px 7px #302c2522}.install-cta:hover{background:#59442b}
+.install-guide{width:min(92vw,470px);padding:0;border:1px solid var(--line);border-radius:16px;background:var(--paper);color:var(--ink);box-shadow:0 20px 60px #0003}.install-guide::backdrop{background:#17130dcc}.install-guide-inner{padding:22px}.install-guide h2{margin:0 0 9px;font:700 21px/1.3 Georgia,serif}.install-guide p,.install-guide li{font:400 14px/1.6 system-ui,sans-serif}.install-guide ul{padding-left:21px}.install-guide .guide-note{color:var(--muted);font-size:12px}.install-guide-close{display:block;margin:16px 0 0 auto;border:0;border-radius:9px;padding:10px 16px;background:#302c25;color:#fff7e8;font:650 13px system-ui,sans-serif;cursor:pointer}
+@media(max-width:560px){.install-prompt{justify-content:space-between;gap:8px;padding:9px 12px}.install-copy strong{font-size:12px}.install-copy span{font-size:11px}.install-cta{padding:9px 12px;font-size:11px}}
+.night .install-prompt{background:#292b2f;border-color:#3c3e42;color:var(--ink)}.night .install-copy span{color:#b2afa8}.night .install-cta,.night .install-guide-close{background:#d6ad71;color:#25231f}.night .install-guide{background:#292b2f;color:var(--ink)}
+
 </style>
 <title>Buscar Sabiduría — R.G Caballero</title>
 </head>
@@ -58,6 +67,10 @@ body.night{--bg:#17191d;--paper:#22252a;--ink:#e5e0d7;--muted:#a8a197;--panel:#2
     <button id="settingsBtn" class="icon-btn" aria-label="Ajustes de lectura" title="Ajustes">Aa</button>
   </div>
 </header>
+<section class="install-prompt" id="installPromptBanner" aria-label="Instalar el libro">
+ <div class="install-copy"><strong>Leé Buscar Sabiduría sin conexión</strong><span>Instalalo gratis en tu celular o computadora.</span></div>
+ <button class="install-cta" id="installBookBtn" type="button">Instalar libro</button>
+</section>
 <main class="reader-layout">
   <aside id="sidebar" class="sidebar" aria-label="Índice del libro">
     <div class="side-head"><span>ÍNDICE</span><button id="closeSidebar" class="icon-btn small-icon" aria-label="Cerrar índice">×</button></div>
@@ -119,6 +132,9 @@ body.night{--bg:#17191d;--paper:#22252a;--ink:#e5e0d7;--muted:#a8a197;--panel:#2
  <textarea id="reflectionArea" spellcheck="true" aria-label="Escribí tu reflexión personal" placeholder="Anotá acá tus ideas, preguntas o desacuerdos…"></textarea>
  <div class="edit-actions"><button id="deleteReflectionBtn" class="quiet-btn">Borrar reflexión</button><button id="cancelReflectionBtn" class="secondary-btn">Cancelar</button><button id="saveReflectionBtn" class="primary-btn">Guardar en mi biblioteca</button></div>
  <p class="modal-note">Esta reflexión es privada: se guarda solo en este dispositivo y no modifica el libro público ni la copia de otros lectores. Podés incluirla en la copia de seguridad desde Ajustes.</p>
+</dialog>
+<dialog id="installGuide" class="install-guide">
+ <div class="install-guide-inner"><h2>Instalá el libro para leer sin conexión</h2><p id="installGuideText">Agregá Buscar Sabiduría a la pantalla de inicio. La instalación es gratuita.</p><ul id="installSteps"></ul><p class="guide-note">La primera vez, abrí el libro con internet para que se guarde en el dispositivo. Después vas a poder leerlo sin conexión.</p><button class="install-guide-close" id="installGuideClose" type="button">Entendido</button></div>
 </dialog>
 <input id="importFile" type="file" accept="application/json" hidden>
 <div id="toast" class="toast" role="status"></div>
@@ -241,6 +257,47 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+<script>
+(() => {
+  const banner = document.getElementById('installPromptBanner');
+  const button = document.getElementById('installBookBtn');
+  const guide = document.getElementById('installGuide');
+  const steps = document.getElementById('installSteps');
+  const guideText = document.getElementById('installGuideText');
+  let deferredPrompt = null;
+  const isInstalled = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const hideBanner = () => { if (banner) banner.hidden = true; };
+  if (isInstalled()) hideBanner();
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    deferredPrompt = event;
+  });
+  window.addEventListener('appinstalled', () => { deferredPrompt = null; hideBanner(); });
+  document.getElementById('installGuideClose').addEventListener('click', () => guide.close());
+  button.addEventListener('click', async () => {
+    if (isInstalled()) { hideBanner(); return; }
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const result = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (result && result.outcome === 'accepted') hideBanner();
+      return;
+    }
+    const ua = navigator.userAgent;
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      guideText.textContent = 'En iPhone o iPad, abrí este link en Safari y seguí estos pasos:';
+      steps.innerHTML = '<li>Tocá el botón Compartir (el cuadrado con la flecha).</li><li>Elegí “Agregar a pantalla de inicio”.</li><li>Tocá “Agregar”.</li>';
+    } else if (/Android/i.test(ua)) {
+      guideText.textContent = 'En Android, si no apareció el aviso automático, usá el menú del navegador:';
+      steps.innerHTML = '<li>Tocá el menú ⋮ de Chrome.</li><li>Elegí “Instalar aplicación” o “Agregar a pantalla principal”.</li><li>Confirmá “Instalar” o “Agregar”.</li>';
+    } else {
+      guideText.textContent = 'En una computadora, buscá el icono Instalar en la barra de direcciones o abrí el menú del navegador:';
+      steps.innerHTML = '<li>En Chrome o Edge, elegí “Instalar Buscar Sabiduría”.</li><li>Confirmá la instalación.</li>';
+    }
+    guide.showModal();
+  });
+})();
 </script>
 </body>
 </html>

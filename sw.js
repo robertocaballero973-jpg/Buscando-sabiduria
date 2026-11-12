@@ -1,5 +1,5 @@
 /* Buscar Sabiduría: guarda el libro para leerlo sin conexión. */
-const CACHE_NAME = 'buscar-sabiduria-pwa-v7-alma-integridad';
+const CACHE_NAME = 'buscar-sabiduria-pwa-v7-alma-integridad2';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {

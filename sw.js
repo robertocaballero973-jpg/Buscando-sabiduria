@@ -1,5 +1,5 @@
 /* Buscar Sabiduría: guarda el libro para leerlo sin conexión. */
-const CACHE_NAME = 'buscar-sabiduria-pwa-v8-reflexiones-visuales-fe-vivida';
+const CACHE_NAME = 'buscar-sabiduria-pwa-v8-reflexiones-visuales-fe-vivida-voluntad-dios';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {

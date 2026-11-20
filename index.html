@@ -195,7 +195,7 @@ function parseContent(raw,section){
  for(const line0 of lines){const line=line0.trim();if(!line){flushPara();flushList();continue;}
    if(line.startsWith('- ')){flushPara();list.push(line.slice(2));continue;}
    flushList();
-   if(section.id==='felicidad-aprender-sentido-vida'&&['El vacío que las cosas no pueden llenar','Disfrutar de la vida también es parte de vivir','Aprender a valorar lo que tenemos','¿Podemos ser felices en medio de una tormenta?','Una manera diferente de comprender la felicidad'].includes(line)){flushPara();html+=`<h2>${esc(line)}</h2>`;continue;}
+   if(section.id==='felicidad-aprender-sentido-vida'&&['¿Tener todo lo que deseamos nos garantiza la felicidad?','El vacío que las cosas no pueden llenar','Disfrutar de la vida también es parte de vivir','Aprender a valorar lo que tenemos','¿Podemos ser felices en medio de una tormenta?','Una manera diferente de comprender la felicidad'].includes(line)){flushPara();html+=`<h2>${esc(line)}</h2>`;continue;}
    if(/^\d+\.\d+\.\s/.test(line)||(/^\d+\.\s/.test(line)&&!line.endsWith('?'))){flushPara();html+=`<h2>${esc(line)}</h2>`;continue;}
    if(/^\d+\.\s/.test(line)){flushPara();html+=`<p class="question-list"><strong>${esc(line)}</strong></p>`;continue;}
    if(/^[A-ZÁÉÍÓÚÜÑ¿¡].{3,100}$/.test(line)&&line===line.toLocaleUpperCase('es')&&!/[.!?]$/.test(line)&&!/^\d/.test(line)){flushPara();html+=`<h2>${esc(line)}</h2>`;continue;}
